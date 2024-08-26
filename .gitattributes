@@ -1,0 +1,2 @@
+# Configura todos os arquivos de texto para usar LF como EOL
+* text=auto eol=lf
