@@ -65,4 +65,38 @@ describe('Users Controller (E2E)', () => {
       }),
     })
   })
+
+  test('[GET] /users/rooms', async () => {
+    const user = await prisma.user.create({
+      data: {
+        name: 'John Doe',
+        email: 'johndoe3@example.com',
+        password: '123456',
+      },
+    })
+
+    const room = await prisma.room.create({
+      data: {
+        name: 'Test Room',
+        ownerId: user.id,
+      },
+    })
+
+    const accessToken = jwt.sign({ sub: user.id })
+
+    const response = await request(app.getHttpServer())
+      .get('/users/rooms')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send()
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toEqual({
+      rooms: [
+        expect.objectContaining({
+          name: room.name,
+          ownerId: room.ownerId,
+        }),
+      ],
+    })
+  })
 })

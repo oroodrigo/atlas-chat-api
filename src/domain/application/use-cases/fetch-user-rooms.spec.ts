@@ -1,22 +1,16 @@
 import { makeRoom } from 'test/factories/makeRooms'
 import { makeUser } from 'test/factories/makeUser'
-import { InMemoryRoomsRepository } from 'test/repositories/in-memory-rooms-repository'
 import { InMemoryUsersRepository } from 'test/repositories/in-memory-users-repository'
 
 import { FetchUserRoomsUseCase } from './fetch-user-rooms'
 
-let inMemoryRoomsRepository: InMemoryRoomsRepository
 let inMemoryUsersRepository: InMemoryUsersRepository
 let sut: FetchUserRoomsUseCase
 
 beforeEach(() => {
-  inMemoryRoomsRepository = new InMemoryRoomsRepository()
   inMemoryUsersRepository = new InMemoryUsersRepository()
 
-  sut = new FetchUserRoomsUseCase(
-    inMemoryRoomsRepository,
-    inMemoryUsersRepository,
-  )
+  sut = new FetchUserRoomsUseCase(inMemoryUsersRepository)
 })
 
 describe('Fetch User Rooms', () => {
@@ -25,13 +19,15 @@ describe('Fetch User Rooms', () => {
     const newRoom = makeRoom({ ownerId: user.id })
     const newRoom2 = makeRoom({ ownerId: user.id })
 
+    user.rooms = [newRoom, newRoom2]
+
     await inMemoryUsersRepository.create(user)
-    await inMemoryRoomsRepository.create(newRoom)
-    await inMemoryRoomsRepository.create(newRoom2)
 
     const { rooms } = await sut.execute({
       userId: user.id,
     })
+
+    console.log(rooms)
 
     expect(rooms).toHaveLength(2)
     expect(rooms).toEqual([newRoom, newRoom2])
