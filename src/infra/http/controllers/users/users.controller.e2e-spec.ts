@@ -82,6 +82,13 @@ describe('Users Controller (E2E)', () => {
       },
     })
 
+    await prisma.userRoom.create({
+      data: {
+        userId: user.id,
+        roomId: room.id,
+      },
+    })
+
     const accessToken = jwt.sign({ sub: user.id })
 
     const response = await request(app.getHttpServer())
