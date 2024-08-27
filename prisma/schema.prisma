@@ -8,30 +8,43 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  email     String    @unique
+  email     String     @unique
   password  String
   imageUrl  String?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @default(now()) @map("updated_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime?  @default(now()) @map("updated_at")
   messages  Message[]
-  rooms     Room[]
+  userRooms UserRoom[]
+  Room      Room[]
 
   @@map("users")
 }
 
 model Room {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  ownerId   String    @map("owner_id")
+  ownerId   String     @map("owner_id")
   imageUrl  String?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @default(now()) @map("updated_at")
-  Message   Message[]
-  owner     User      @relation(fields: [ownerId], references: [id])
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime?  @default(now()) @map("updated_at")
+  owner     User       @relation(fields: [ownerId], references: [id])
+  messages  Message[]
+  userRooms UserRoom[]
 
   @@map("rooms")
+}
+
+model UserRoom {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  roomId   String   @map("room_id")
+  user     User     @relation(fields: [userId], references: [id])
+  room     Room     @relation(fields: [roomId], references: [id])
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  @@map("user_rooms")
 }
 
 model Message {
