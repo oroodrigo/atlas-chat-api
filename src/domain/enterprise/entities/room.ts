@@ -6,7 +6,7 @@ export interface RoomProps {
   ownerId: string
   imageUrl?: string | null
   createdAt: Date
-  updatedAt?: Date
+  updatedAt?: Date | null
 }
 
 export class Room {

@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
+import { Injectable } from '@nestjs/common'
+
 import { Room } from '@/domain/enterprise/entities/room'
 
 import { RoomsRepository } from '../repositories/rooms-repository'
@@ -13,6 +15,7 @@ interface CreateRoomUseCaseResponse {
   room: Room
 }
 
+@Injectable()
 export class CreateRoomUseCase {
   constructor(private roomsRepository: RoomsRepository) {}
 
