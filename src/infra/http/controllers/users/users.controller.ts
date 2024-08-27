@@ -88,8 +88,6 @@ export class UsersController {
         userId: sub,
       })
 
-      console.log(rooms)
-
       return { rooms: rooms.map(RoomPresenter.toHTTP) }
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
