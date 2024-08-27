@@ -2,6 +2,7 @@ import { makeRoom } from 'test/factories/makeRooms'
 import { InMemoryRoomsRepository } from 'test/repositories/in-memory-rooms-repository'
 
 import { DeleteRoomUseCase } from './delete-ROOM'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 let inMemoryRoomsRepository: InMemoryRoomsRepository
 let sut: DeleteRoomUseCase
@@ -45,6 +46,6 @@ describe('Delete Room', () => {
         roomId: room.id,
         ownerId: 'user-id-2',
       })
-    }).rejects.toBeInstanceOf(Error)
+    }).rejects.toBeInstanceOf(UnauthorizedError)
   })
 })
