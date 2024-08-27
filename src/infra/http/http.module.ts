@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 
 import { AuthenticateUserUseCase } from '@/domain/application/use-cases/authenticate-user'
 import { CreateRoomUseCase } from '@/domain/application/use-cases/create-room'
+import { FetchUserRoomsUseCase } from '@/domain/application/use-cases/fetch-user-rooms'
 import { GetProfileUseCase } from '@/domain/application/use-cases/get-profile'
 import { RegisterUserUseCase } from '@/domain/application/use-cases/register-user'
 
@@ -19,6 +20,7 @@ import { UsersController } from './controllers/users/users.controller'
     AuthenticateUserUseCase,
     GetProfileUseCase,
     CreateRoomUseCase,
+    FetchUserRoomsUseCase,
   ],
 })
 export class HttpModule {}

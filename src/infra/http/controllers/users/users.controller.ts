@@ -11,6 +11,7 @@ import {
 
 import { ResourceNotFoundError } from '@/domain/application/use-cases/errors/resource-not-found-error'
 import { UserAlreadyExistsError } from '@/domain/application/use-cases/errors/user-already-exists-error'
+import { FetchUserRoomsUseCase } from '@/domain/application/use-cases/fetch-user-rooms'
 import { GetProfileUseCase } from '@/domain/application/use-cases/get-profile'
 import { RegisterUserUseCase } from '@/domain/application/use-cases/register-user'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
@@ -19,6 +20,7 @@ import { Public } from '@/infra/auth/public'
 
 import { ZodValidationPipe } from '../../pipes/zod-validation-pipe'
 import { ProfilePresenter } from '../../presenters/profile-presenter'
+import { RoomPresenter } from '../../presenters/room-presenter'
 import {
   CreateAccountBodySchema,
   createAccountBodySchema,
@@ -29,6 +31,7 @@ export class UsersController {
   constructor(
     private getProfile: GetProfileUseCase,
     private registerUser: RegisterUserUseCase,
+    private fetchRooms: FetchUserRoomsUseCase,
   ) {}
 
   @Get('/me')
@@ -68,6 +71,26 @@ export class UsersController {
     } catch (error) {
       if (error instanceof UserAlreadyExistsError) {
         throw new ConflictException(error.message)
+      }
+
+      throw new BadRequestException(error)
+    }
+  }
+
+  @Get('/rooms')
+  @HttpCode(200)
+  async fetchUserRooms(@CurrentUser() user: UserPayload) {
+    const { sub } = user
+
+    try {
+      const { rooms } = await this.fetchRooms.execute({
+        userId: sub,
+      })
+
+      return { rooms: rooms.map(RoomPresenter.toHTTP) }
+    } catch (error) {
+      if (error instanceof ResourceNotFoundError) {
+        throw new BadRequestException(error.message)
       }
 
       throw new BadRequestException(error)

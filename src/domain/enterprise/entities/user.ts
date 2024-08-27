@@ -1,10 +1,13 @@
 import { Optional } from '@/core/types/optional'
 
+import { Room } from './room'
+
 export interface UserProps {
   id: string
   name: string
   email: string
   password: string
+  rooms: Room[]
   imageUrl?: string | null
   createdAt: Date
   updatedAt?: Date | null
@@ -15,6 +18,7 @@ export class User {
   private _name: string
   private _email: string
   private _password: string
+  private _rooms: Room[]
   private _imageUrl?: string | null
   private _createdAt: Date
   private _updatedAt?: Date
@@ -25,6 +29,7 @@ export class User {
     this._name = props.name
     this._password = props.password
     this._imageUrl = props.imageUrl
+    this._rooms = props.rooms
     this._createdAt = props.createdAt
   }
 
@@ -48,6 +53,10 @@ export class User {
     return this._imageUrl
   }
 
+  get rooms() {
+    return this._rooms
+  }
+
   get createdAt() {
     return this._createdAt
   }
@@ -56,16 +65,26 @@ export class User {
     return this._updatedAt
   }
 
+  // Setters
+
+  set rooms(newRooms: Room[]) {
+    this._rooms = newRooms
+  }
+
   private touch() {
     this._updatedAt = new Date()
   }
 
   static create(
-    props: Optional<UserProps, 'createdAt' | 'imageUrl' | 'updatedAt'>,
+    props: Optional<
+      UserProps,
+      'createdAt' | 'imageUrl' | 'updatedAt' | 'rooms'
+    >,
   ) {
     const user = new User({
       ...props,
       createdAt: new Date(),
+      rooms: props.rooms ?? [],
     })
     return user
   }

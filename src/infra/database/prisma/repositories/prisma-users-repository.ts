@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { UsersRepository } from '@/domain/application/repositories/users-repository'
 import { User } from '@/domain/enterprise/entities/user'
 
+import { PrismaRoomMapper } from '../mappers/prisma-room-mapper'
 import { PrismaUserMapper } from '../mappers/prisma-user-mapper'
 import { PrismaService } from '../prisma.service'
 
@@ -45,6 +46,23 @@ export class PrismaUsersRepository implements UsersRepository {
     })
 
     return users.map(PrismaUserMapper.toDomain)
+  }
+
+  async fetchRooms(userId: string) {
+    const userWithRooms = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        rooms: true,
+      },
+    })
+
+    if (!userWithRooms || !userWithRooms.rooms) {
+      return []
+    }
+
+    return userWithRooms.rooms.map(PrismaRoomMapper.toDomain)
   }
 
   async create(user: User) {
