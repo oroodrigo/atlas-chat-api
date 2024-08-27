@@ -6,7 +6,7 @@ import request from 'supertest'
 import { AppModule } from '@/infra/app.module'
 import { PrismaService } from '@/infra/database/prisma/prisma.service'
 
-describe('Create account (E2E)', () => {
+describe('Users Controller (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let jwt: JwtService
@@ -51,7 +51,6 @@ describe('Create account (E2E)', () => {
     })
 
     const accessToken = jwt.sign({ sub: user.id })
-    console.log(accessToken)
 
     const response = await request(app.getHttpServer())
       .get('/users/me')
