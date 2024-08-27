@@ -1,13 +1,13 @@
 import { Optional } from '@/core/types/optional'
 
-import { Room } from './room'
+import { UserRoom } from './user-room'
 
 export interface UserProps {
   id: string
   name: string
   email: string
   password: string
-  rooms: Room[]
+  rooms: UserRoom[]
   imageUrl?: string | null
   createdAt: Date
   updatedAt?: Date | null
@@ -18,7 +18,7 @@ export class User {
   private _name: string
   private _email: string
   private _password: string
-  private _rooms: Room[]
+  private _rooms: UserRoom[]
   private _imageUrl?: string | null
   private _createdAt: Date
   private _updatedAt?: Date
@@ -50,7 +50,7 @@ export class User {
   }
 
   get imageUrl() {
-    return this._imageUrl
+    return this._imageUrl ?? ''
   }
 
   get rooms() {
@@ -67,8 +67,9 @@ export class User {
 
   // Setters
 
-  set rooms(newRooms: Room[]) {
-    this._rooms = newRooms
+  set imageUrl(newProfilePicUrl: string) {
+    this._imageUrl = newProfilePicUrl
+    this.touch()
   }
 
   private touch() {
@@ -83,7 +84,7 @@ export class User {
   ) {
     const user = new User({
       ...props,
-      createdAt: new Date(),
+      createdAt: props.createdAt ?? new Date(),
       rooms: props.rooms ?? [],
     })
     return user

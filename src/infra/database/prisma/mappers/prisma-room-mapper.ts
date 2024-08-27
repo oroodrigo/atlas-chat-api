@@ -11,6 +11,7 @@ export class PrismaRoomMapper {
       imageUrl: raw.imageUrl,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
+      users: [],
     })
   }
 

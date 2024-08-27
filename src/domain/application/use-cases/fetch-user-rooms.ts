@@ -26,8 +26,8 @@ export class FetchUserRoomsUseCase {
       throw new ResourceNotFoundError()
     }
 
-    const rooms = await this.usersRepository.fetchRooms(userId)
+    const userRooms = await this.usersRepository.fetchRooms(userId)
 
-    return { rooms }
+    return { rooms: userRooms.map((userRoom) => userRoom.room) }
   }
 }

@@ -1,4 +1,6 @@
 import { MessagesRepository } from '../repositories/messages-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 interface DeleteMessageUseCaseRequest {
   messageId: string
@@ -12,11 +14,11 @@ export class DeleteMessageUseCase {
     const message = await this.messagesRepository.findById(messageId)
 
     if (!message) {
-      throw new Error('Resource not found.')
+      throw new ResourceNotFoundError()
     }
 
     if (message.authorId !== authorId) {
-      throw new Error('Not allowed.')
+      throw new UnauthorizedError()
     }
 
     await this.messagesRepository.delete(message)

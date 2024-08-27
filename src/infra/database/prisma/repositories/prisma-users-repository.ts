@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common'
 
 import { UsersRepository } from '@/domain/application/repositories/users-repository'
+import { Room } from '@/domain/enterprise/entities/room'
 import { User } from '@/domain/enterprise/entities/user'
 
 import { PrismaRoomMapper } from '../mappers/prisma-room-mapper'
 import { PrismaUserMapper } from '../mappers/prisma-user-mapper'
+import { PrismaUserRoomMapper } from '../mappers/prisma-user-room-mapper'
 import { PrismaService } from '../prisma.service'
 
 @Injectable()
@@ -12,9 +14,7 @@ export class PrismaUsersRepository implements UsersRepository {
   constructor(private prisma: PrismaService) {}
   async findById(userId: string) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
     })
 
     if (!user) {
@@ -53,16 +53,36 @@ export class PrismaUsersRepository implements UsersRepository {
       where: {
         id: userId,
       },
-      select: {
-        rooms: true,
+      include: {
+        userRooms: {
+          include: {
+            room: true,
+          },
+        },
       },
     })
 
-    if (!userWithRooms || !userWithRooms.rooms) {
+    if (!userWithRooms) {
       return []
     }
 
-    return userWithRooms.rooms.map(PrismaRoomMapper.toDomain)
+    const user = PrismaUserMapper.toDomain(userWithRooms)
+
+    return userWithRooms.userRooms.map((userRoom) => {
+      const room: Room = PrismaRoomMapper.toDomain(userRoom.room)
+      return PrismaUserRoomMapper.toDomain(userRoom, user, room)
+    })
+  }
+
+  async isUserInRoom(userId: string, roomId: string) {
+    const userRoom = await this.prisma.userRoom.findFirst({
+      where: {
+        userId,
+        roomId,
+      },
+    })
+
+    return userRoom !== null
   }
 
   async create(user: User) {

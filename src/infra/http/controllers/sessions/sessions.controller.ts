@@ -19,7 +19,7 @@ import {
 
 @Controller('/sessions')
 export class SessionsController {
-  constructor(private authenticateUser: AuthenticateUserUseCase) {}
+  constructor(private authenticateUserUseCase: AuthenticateUserUseCase) {}
 
   @Post()
   @Public()
@@ -28,7 +28,7 @@ export class SessionsController {
     const { email, password } = body
 
     try {
-      const { accessToken } = await this.authenticateUser.execute({
+      const { accessToken } = await this.authenticateUserUseCase.execute({
         email,
         password,
       })
@@ -36,7 +36,7 @@ export class SessionsController {
       return { access_token: accessToken }
     } catch (error) {
       if (error instanceof WrongCredentialsError) {
-        throw new UnauthorizedException()
+        throw new UnauthorizedException(error.message)
       }
 
       throw new BadRequestException()

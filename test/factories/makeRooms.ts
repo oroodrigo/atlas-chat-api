@@ -8,6 +8,7 @@ export function makeRoom(override: Partial<RoomProps> = {}) {
     id: randomUUID(),
     name: faker.word.words(),
     ownerId: randomUUID(),
+    users: [],
     ...override,
   })
 

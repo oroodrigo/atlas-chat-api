@@ -1,10 +1,15 @@
+import { Injectable } from '@nestjs/common'
+
 import { RoomsRepository } from '../repositories/rooms-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 interface DeleteRoomUseCaseRequest {
   roomId: string
   ownerId: string
 }
 
+@Injectable()
 export class DeleteRoomUseCase {
   constructor(private roomsRepository: RoomsRepository) {}
 
@@ -12,11 +17,11 @@ export class DeleteRoomUseCase {
     const room = await this.roomsRepository.findById(roomId)
 
     if (!room) {
-      throw new Error('Resource not found.')
+      throw new ResourceNotFoundError()
     }
 
     if (room.ownerId !== ownerId) {
-      throw new Error('Not Allowed')
+      throw new UnauthorizedError()
     }
 
     await this.roomsRepository.delete(room)

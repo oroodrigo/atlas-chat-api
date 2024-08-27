@@ -31,10 +31,23 @@ export class InMemoryUsersRepository implements UsersRepository {
   }
 
   async fetchRooms(userId: string) {
-    const allRooms = this.items.flatMap((user) => user.rooms)
-    const filteredRooms = allRooms.filter((room) => room.ownerId === userId)
+    const user = this.items.find((user) => user.id === userId)
 
-    return filteredRooms
+    if (!user) {
+      return []
+    }
+
+    return user.rooms
+  }
+
+  async isUserInRoom(userId: string, roomId: string) {
+    const user = this.items.find((user) => user.id === userId)
+
+    if (!user) {
+      return false
+    }
+
+    return user.rooms.some((room) => room.id === roomId)
   }
 
   async create(user: User) {

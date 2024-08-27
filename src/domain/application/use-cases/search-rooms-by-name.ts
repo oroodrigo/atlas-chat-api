@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common'
+
 import { Room } from '@/domain/enterprise/entities/room'
 
 import { RoomsRepository } from '../repositories/rooms-repository'
@@ -10,6 +12,7 @@ interface SearchRoomsByNameUseCaseResponse {
   rooms: Room[]
 }
 
+@Injectable()
 export class SearchRoomsByNameUseCase {
   constructor(private roomsRepository: RoomsRepository) {}
 

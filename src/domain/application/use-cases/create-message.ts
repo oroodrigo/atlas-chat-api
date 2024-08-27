@@ -4,6 +4,7 @@ import { Message } from '@/domain/enterprise/entities/message'
 
 import { MessagesRepository } from '../repositories/messages-repository'
 import { RoomsRepository } from '../repositories/rooms-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface CreateMessageUseCaseRequest {
   content: string
@@ -29,7 +30,7 @@ export class CreateMessageUseCase {
     const room = await this.roomsRepository.findById(roomId)
 
     if (!room) {
-      throw new Error('Resource not found.')
+      throw new ResourceNotFoundError()
     }
 
     const message = Message.create({

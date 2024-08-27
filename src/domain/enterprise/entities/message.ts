@@ -46,7 +46,7 @@ export class Message {
   static create(props: Optional<MessageProps, 'timestamp'>) {
     const message = new Message({
       ...props,
-      timestamp: new Date(),
+      timestamp: props.timestamp ?? new Date(),
     })
 
     return message

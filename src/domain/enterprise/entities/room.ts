@@ -1,10 +1,13 @@
 import { Optional } from '@/core/types/optional'
 
+import { UserRoom } from './user-room'
+
 export interface RoomProps {
   id: string
   name: string
   ownerId: string
   imageUrl?: string | null
+  users: UserRoom[]
   createdAt: Date
   updatedAt?: Date | null
 }
@@ -14,6 +17,7 @@ export class Room {
   private _name: string
   private _ownerId: string
   private _imageUrl?: string | null
+  private _users: UserRoom[]
   private _createdAt: Date
   private _updatedAt?: Date
 
@@ -21,6 +25,7 @@ export class Room {
     this._id = props.id
     this._name = props.name
     this._imageUrl = props.imageUrl
+    this._users = props.users
     this._createdAt = props.createdAt
     this._ownerId = props.ownerId
   }
@@ -39,6 +44,10 @@ export class Room {
 
   get imageUrl(): string | null | undefined {
     return this._imageUrl
+  }
+
+  get users() {
+    return this._users
   }
 
   get createdAt() {
@@ -66,7 +75,10 @@ export class Room {
   }
 
   static create(props: Optional<RoomProps, 'createdAt'>) {
-    const room = new Room({ ...props, createdAt: new Date() })
+    const room = new Room({
+      ...props,
+      createdAt: props.createdAt ?? new Date(),
+    })
 
     return room
   }

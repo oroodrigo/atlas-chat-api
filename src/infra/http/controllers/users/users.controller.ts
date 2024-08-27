@@ -21,6 +21,7 @@ import { Public } from '@/infra/auth/public'
 import { ZodValidationPipe } from '../../pipes/zod-validation-pipe'
 import { ProfilePresenter } from '../../presenters/profile-presenter'
 import { RoomPresenter } from '../../presenters/room-presenter'
+import { UserPresenter } from '../../presenters/user-presenter'
 import {
   CreateAccountBodySchema,
   createAccountBodySchema,
@@ -29,9 +30,9 @@ import {
 @Controller('/users')
 export class UsersController {
   constructor(
-    private getProfile: GetProfileUseCase,
-    private registerUser: RegisterUserUseCase,
-    private fetchRooms: FetchUserRoomsUseCase,
+    private getProfileUseCase: GetProfileUseCase,
+    private registerUserUseCase: RegisterUserUseCase,
+    private fetchRoomsUseCase: FetchUserRoomsUseCase,
   ) {}
 
   @Get('/me')
@@ -39,7 +40,7 @@ export class UsersController {
     const { sub } = user
 
     try {
-      const { user } = await this.getProfile.execute({
+      const { user } = await this.getProfileUseCase.execute({
         userId: sub,
       })
 
@@ -61,13 +62,13 @@ export class UsersController {
     const { name, email, password } = body
 
     try {
-      const { user } = await this.registerUser.execute({
+      const { user } = await this.registerUserUseCase.execute({
         name,
         email,
         password,
       })
 
-      return { user }
+      return { user: UserPresenter.toHTTP(user) }
     } catch (error) {
       if (error instanceof UserAlreadyExistsError) {
         throw new ConflictException(error.message)
@@ -83,9 +84,11 @@ export class UsersController {
     const { sub } = user
 
     try {
-      const { rooms } = await this.fetchRooms.execute({
+      const { rooms } = await this.fetchRoomsUseCase.execute({
         userId: sub,
       })
+
+      console.log(rooms)
 
       return { rooms: rooms.map(RoomPresenter.toHTTP) }
     } catch (error) {
