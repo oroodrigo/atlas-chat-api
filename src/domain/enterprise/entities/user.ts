@@ -49,8 +49,8 @@ export class User {
     return this._password
   }
 
-  get imageUrl() {
-    return this._imageUrl ?? ''
+  get imageUrl(): string | null | undefined {
+    return this._imageUrl
   }
 
   get rooms() {

@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common'
+
 import { Message } from '@/domain/enterprise/entities/message'
 
 import { MessagesRepository } from '../repositories/messages-repository'
@@ -12,6 +14,7 @@ interface GetRoomMessagesUseCaseResponse {
   messages: Message[]
 }
 
+@Injectable()
 export class GetRoomMessagesUseCase {
   constructor(
     private messagesRepository: MessagesRepository,

@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
+import { Injectable } from '@nestjs/common'
+
 import { Message } from '@/domain/enterprise/entities/message'
 
 import { MessagesRepository } from '../repositories/messages-repository'
@@ -15,7 +17,7 @@ interface CreateMessageUseCaseRequest {
 interface CreateMessageUseCaseResponse {
   message: Message
 }
-
+@Injectable()
 export class CreateMessageUseCase {
   constructor(
     private messagesRepository: MessagesRepository,

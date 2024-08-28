@@ -3,12 +3,12 @@ import { User } from '@/domain/enterprise/entities/user'
 export class ProfilePresenter {
   static toHTTP(user: User) {
     return {
-      id: user.id.toString(),
+      id: user.id,
       name: user.name,
       email: user.email,
-      imageUrl: user.imageUrl ?? null,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      image_url: user.imageUrl ?? null,
+      created_at: user.createdAt,
+      updated_at: user.updatedAt,
     }
   }
 }
