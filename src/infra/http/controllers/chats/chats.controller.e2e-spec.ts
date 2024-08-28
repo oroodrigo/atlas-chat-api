@@ -115,4 +115,74 @@ describe('Chats Controller (E2E)', () => {
     expect(response.statusCode).toBe(200)
     expect(roomOnDatabase).toBe(null)
   })
+
+  // Messages Test
+
+  test('[POST] /chats/:roomId/messages', async () => {
+    await prisma.room.create({
+      data: {
+        id: createdRoomId,
+        name: 'anything',
+        ownerId: user.id,
+      },
+    })
+
+    const response = await request(app.getHttpServer())
+      .post(`/chats/${createdRoomId}/messages`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        content: 'test message',
+      })
+
+    expect(response.statusCode).toBe(201)
+    expect(response.body).toMatchObject({
+      message: expect.objectContaining({
+        content: 'test message',
+        author_id: user.id,
+        room_id: createdRoomId,
+      }),
+    })
+  })
+
+  test('[GET] /chats/:roomId/messages', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/chats/${createdRoomId}/messages`)
+      .set('Authorization', `Bearer ${accessToken}`)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.messages).toHaveLength(1)
+    expect(response.body).toMatchObject({
+      messages: [
+        expect.objectContaining({
+          content: 'test message',
+          author_id: user.id,
+          room_id: createdRoomId,
+        }),
+      ],
+    })
+  })
+
+  test('[DELETE] /chats/:roomId/messages/:messageId', async () => {
+    const message = await prisma.message.create({
+      data: {
+        content: 'foo',
+        timeStamp: new Date(),
+        authorId: user.id,
+        roomId: createdRoomId,
+      },
+    })
+
+    const response = await request(app.getHttpServer())
+      .delete(`/chats/${createdRoomId}/messages/${message.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+
+    const messageOnDatabase = await prisma.message.findUnique({
+      where: {
+        id: message.id,
+      },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(messageOnDatabase).toBe(null)
+  })
 })
