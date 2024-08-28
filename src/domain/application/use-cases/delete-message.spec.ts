@@ -1,15 +1,22 @@
 import { makeMessage } from 'test/factories/makeMessage'
 import { makeRoom } from 'test/factories/makeRooms'
 import { InMemoryMessagesRepository } from 'test/repositories/in-memory-messages-repository'
+import { InMemoryRoomsRepository } from 'test/repositories/in-memory-rooms-repository'
 
 import { DeleteMessageUseCase } from './delete-message'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 let inMemoryMessagesRepository: InMemoryMessagesRepository
+let inMemoryRoomsRepository: InMemoryRoomsRepository
 let sut: DeleteMessageUseCase
 
 beforeEach(() => {
   inMemoryMessagesRepository = new InMemoryMessagesRepository()
-  sut = new DeleteMessageUseCase(inMemoryMessagesRepository)
+  inMemoryRoomsRepository = new InMemoryRoomsRepository()
+  sut = new DeleteMessageUseCase(
+    inMemoryMessagesRepository,
+    inMemoryRoomsRepository,
+  )
 })
 
 describe('Delete Message', () => {
@@ -20,6 +27,7 @@ describe('Delete Message', () => {
       authorId: 'author-1',
     })
 
+    await inMemoryRoomsRepository.create(room)
     await inMemoryMessagesRepository.create(message)
 
     expect(inMemoryMessagesRepository.items).toHaveLength(1)
@@ -29,6 +37,7 @@ describe('Delete Message', () => {
     await sut.execute({
       messageId: message.id,
       authorId: 'author-1',
+      roomId: room.id,
     })
 
     expect(inMemoryMessagesRepository.items).toHaveLength(0)
@@ -41,6 +50,7 @@ describe('Delete Message', () => {
       authorId: 'author-1',
     })
 
+    await inMemoryRoomsRepository.create(room)
     await inMemoryMessagesRepository.create(message)
 
     expect(inMemoryMessagesRepository.items).toHaveLength(1)
@@ -51,8 +61,9 @@ describe('Delete Message', () => {
       return await sut.execute({
         messageId: message.id,
         authorId: 'author-2',
+        roomId: room.id,
       })
-    }).rejects.toBeInstanceOf(Error)
+    }).rejects.toBeInstanceOf(UnauthorizedError)
     expect(inMemoryMessagesRepository.items).toHaveLength(1)
   })
 })
