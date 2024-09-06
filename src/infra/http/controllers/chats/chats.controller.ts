@@ -15,7 +15,7 @@ import {
 import { CreateMessageUseCase } from '@/domain/application/use-cases/create-message'
 import { CreateRoomUseCase } from '@/domain/application/use-cases/create-room'
 import { DeleteMessageUseCase } from '@/domain/application/use-cases/delete-message'
-import { DeleteRoomUseCase } from '@/domain/application/use-cases/delete-ROOM'
+import { DeleteRoomUseCase } from '@/domain/application/use-cases/delete-room'
 import { ResourceNotFoundError } from '@/domain/application/use-cases/errors/resource-not-found-error'
 import { UnauthorizedError } from '@/domain/application/use-cases/errors/unauthorized-error'
 import { UserAlreadyInChatRoomError } from '@/domain/application/use-cases/errors/user-already-in-chat-room-error'
@@ -29,6 +29,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { ZodValidationPipe } from '../../pipes/zod-validation-pipe'
 import { MessagePresenter } from '../../presenters/message-presenter'
 import { RoomPresenter } from '../../presenters/room-presenter'
+import { EventsGateway, EventsKind } from '../../websocket/events.gateway'
 import {
   CreateMessageBodySchema,
   createMessageBodySchema,
@@ -39,6 +40,7 @@ import { NewChatBodySchema, newChatBodySchema } from './schemas/new-chat-schema'
 @Controller('/chats')
 export class ChatsController {
   constructor(
+    private eventsGateway: EventsGateway,
     private createRoomUseCase: CreateRoomUseCase,
     private joinRoomUseCase: JoinRoomUseCase,
     private getRoomByIdUseCase: GetRoomByIdUseCase,
@@ -65,6 +67,16 @@ export class ChatsController {
         name,
         ownerId: sub,
       })
+
+      const roomNamespace = this.eventsGateway.server.of(`/room-${room.id}`)
+
+      this.eventsGateway.server.emit('new_room', {
+        kind: 'new_room' as EventsKind,
+        room: RoomPresenter.toHTTP(room),
+      })
+
+      roomNamespace.emit('join', { userId: sub, roomId: room.id })
+
       return { room: RoomPresenter.toHTTP(room) }
     } catch (error) {
       console.log(error)
@@ -83,6 +95,11 @@ export class ChatsController {
       await this.joinRoomUseCase.execute({
         roomId,
         userId: sub,
+      })
+
+      this.eventsGateway.server.to(`/room-${roomId}`).emit('user_joined', {
+        userId: sub,
+        roomId,
       })
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
@@ -178,7 +195,13 @@ export class ChatsController {
         roomId,
       })
 
+      this.eventsGateway.server.to(roomId).emit('new_message', {
+        kind: 'new_message' as EventsKind,
+        message: MessagePresenter.toHTTP(message),
+      })
+
       return {
+        kind: 'new_message' as EventsKind,
         message: MessagePresenter.toHTTP(message),
       }
     } catch (error) {

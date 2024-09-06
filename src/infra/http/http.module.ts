@@ -4,7 +4,7 @@ import { AuthenticateUserUseCase } from '@/domain/application/use-cases/authenti
 import { CreateMessageUseCase } from '@/domain/application/use-cases/create-message'
 import { CreateRoomUseCase } from '@/domain/application/use-cases/create-room'
 import { DeleteMessageUseCase } from '@/domain/application/use-cases/delete-message'
-import { DeleteRoomUseCase } from '@/domain/application/use-cases/delete-ROOM'
+import { DeleteRoomUseCase } from '@/domain/application/use-cases/delete-room'
 import { FetchUserRoomsUseCase } from '@/domain/application/use-cases/fetch-user-rooms'
 import { GetProfileUseCase } from '@/domain/application/use-cases/get-profile'
 import { GetRoomByIdUseCase } from '@/domain/application/use-cases/get-room-by-id'
@@ -18,9 +18,11 @@ import { DatabaseModule } from '../database/database.module'
 import { ChatsController } from './controllers/chats/chats.controller'
 import { SessionsController } from './controllers/sessions/sessions.controller'
 import { UsersController } from './controllers/users/users.controller'
+import { EventsGateway } from './websocket/events.gateway'
+import { WebSocketModule } from './websocket/websocket.module'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, WebSocketModule],
   controllers: [UsersController, ChatsController, SessionsController],
   providers: [
     RegisterUserUseCase,
@@ -35,6 +37,7 @@ import { UsersController } from './controllers/users/users.controller'
     CreateMessageUseCase,
     GetRoomMessagesUseCase,
     DeleteMessageUseCase,
+    EventsGateway,
   ],
 })
 export class HttpModule {}
