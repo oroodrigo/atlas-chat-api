@@ -42,6 +42,10 @@ Agora você está pronto para iniciar o projeto usando o comando abaixo.
 # Para uso somente em ambientes de desenvolvimento, realiza uma migração Prisma
 npx prisma migrate dev
 
+# Para iniciar o container do docker
+
+npm run docker:start
+
 #Inicie o servidor de desenvolvimento com TSNode
 npm run dev
 ```
