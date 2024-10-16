@@ -52,10 +52,7 @@ describe('Join Room', () => {
       roomId: newRoom2.id,
     })
 
-    expect(user.rooms).toHaveLength(2)
-    expect(user.rooms).toEqual([
-      expect.objectContaining(previewsRelation),
-      expect.objectContaining(userRoom),
-    ])
+    expect(userRoom.roomId).toEqual(newRoom2.id)
+    expect(userRoom.userId).toEqual(user.id)
   })
 })

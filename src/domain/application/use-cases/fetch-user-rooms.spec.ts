@@ -35,7 +35,7 @@ describe('Fetch User Rooms', () => {
       room: newRoom2,
     })
 
-    user.rooms.push(userRoom1, userRoom2)
+    user.rooms.push(userRoom1.room, userRoom2.room)
 
     await inMemoryUsersRepository.create(user)
 
