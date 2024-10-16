@@ -1,13 +1,13 @@
 import { Optional } from '@/core/types/optional'
 
-import { UserRoom } from './user-room'
+import { User } from './user'
 
 export interface RoomProps {
   id: string
   name: string
   ownerId: string
   imageUrl?: string | null
-  users: UserRoom[]
+  users: User[]
   createdAt: Date
   updatedAt?: Date | null
 }
@@ -17,7 +17,7 @@ export class Room {
   private _name: string
   private _ownerId: string
   private _imageUrl?: string | null
-  private _users: UserRoom[]
+  private _users: User[]
   private _createdAt: Date
   private _updatedAt?: Date
 

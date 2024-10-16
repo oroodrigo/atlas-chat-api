@@ -14,6 +14,13 @@ export class PrismaRoomsRepository implements RoomsRepository {
       where: {
         id,
       },
+      include: {
+        userRooms: {
+          include: {
+            user: true,
+          },
+        },
+      },
     })
 
     if (!room) {
@@ -28,6 +35,13 @@ export class PrismaRoomsRepository implements RoomsRepository {
       where: {
         name,
       },
+      include: {
+        userRooms: {
+          include: {
+            user: true,
+          },
+        },
+      },
     })
 
     return rooms.map(PrismaRoomMapper.toDomain)
@@ -37,6 +51,13 @@ export class PrismaRoomsRepository implements RoomsRepository {
     const userRooms = await this.prisma.room.findMany({
       where: {
         ownerId: userId,
+      },
+      include: {
+        userRooms: {
+          include: {
+            user: true,
+          },
+        },
       },
     })
 
@@ -53,6 +74,7 @@ export class PrismaRoomsRepository implements RoomsRepository {
 
   async save(room: Room) {
     const data = PrismaRoomMapper.toPrisma(room)
+    console.log('save', data)
 
     await this.prisma.room.update({
       data,

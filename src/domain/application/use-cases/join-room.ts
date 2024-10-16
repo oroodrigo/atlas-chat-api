@@ -61,10 +61,6 @@ export class JoinRoomUseCase {
 
     await this.usersRoomsRepository.create(userRoom)
 
-    user.rooms.push(userRoom)
-
-    await this.usersRepository.save(user)
-
     return { userRoom }
   }
 }

@@ -55,11 +55,9 @@ export class CreateRoomUseCase {
     })
 
     userRoom.room = room
-    roomOwner.rooms.push(userRoom)
 
     await this.roomsRepository.create(room)
     await this.usersRoomsRepository.create(userRoom)
-    await this.usersRepository.save(roomOwner)
 
     return { room }
   }

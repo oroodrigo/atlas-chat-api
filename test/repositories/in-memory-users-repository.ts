@@ -50,6 +50,18 @@ export class InMemoryUsersRepository implements UsersRepository {
     return user.rooms.some((room) => room.id === roomId)
   }
 
+  async findManyInRoom(roomId: string) {
+    const users = this.items.filter((user) =>
+      user.rooms.map((room) => room.id === roomId),
+    )
+
+    if (!users) {
+      return []
+    }
+
+    return users
+  }
+
   async create(user: User) {
     this.items.push(user)
   }

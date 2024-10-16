@@ -9,6 +9,12 @@ export class RoomPresenter {
       image_url: room.imageUrl ?? null,
       created_at: room.createdAt,
       updated_at: room.updatedAt,
+      users: room.users.map((user) => {
+        return {
+          id: user.id,
+          name: user.name,
+        }
+      }),
     }
   }
 }
