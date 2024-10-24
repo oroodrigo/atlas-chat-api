@@ -7,6 +7,7 @@ export class PrismaMessageMapper {
     return Message.create({
       id: raw.id,
       authorId: raw.authorId,
+      authorName: raw.authorName,
       roomId: raw.roomId,
       content: raw.content,
       timestamp: raw.timeStamp,
@@ -17,6 +18,7 @@ export class PrismaMessageMapper {
     return {
       id: message.id,
       authorId: message.authorId,
+      authorName: message.authorName,
       roomId: message.roomId,
       content: message.content,
       timeStamp: message.timestamp,

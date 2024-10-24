@@ -48,15 +48,16 @@ model UserRoom {
 }
 
 model Message {
-  id        String    @id @default(uuid())
-  content   String
-  authorId  String    @map("author_id")
-  roomId    String    @map("room_id")
-  timeStamp DateTime
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @default(now()) @map("updated_at")
-  author    User      @relation(fields: [authorId], references: [id])
-  room      Room      @relation(fields: [roomId], references: [id])
+  id         String    @id @default(uuid())
+  content    String
+  authorId   String    @map("author_id")
+  authorName String    @map("author_name")
+  roomId     String    @map("room_id")
+  timeStamp  DateTime
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime? @default(now()) @map("updated_at")
+  author     User      @relation(fields: [authorId], references: [id])
+  room       Room      @relation(fields: [roomId], references: [id])
 
   @@map("messages")
 }

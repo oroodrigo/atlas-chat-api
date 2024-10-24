@@ -4,6 +4,7 @@ export interface MessageProps {
   id: string
   content: string
   authorId: string
+  authorName: string
   roomId: string
   timestamp: Date
 }
@@ -12,6 +13,7 @@ export class Message {
   private _id: string
   private _content: string
   private _authorId: string
+  private _authorName: string
   private _roomId: string
   private _timestamp: Date
 
@@ -19,6 +21,7 @@ export class Message {
     this._id = props.id
     this._content = props.content
     this._authorId = props.authorId
+    this._authorName = props.authorName
     this._roomId = props.roomId
     this._timestamp = props.timestamp
   }
@@ -33,6 +36,10 @@ export class Message {
 
   get authorId() {
     return this._authorId
+  }
+
+  get authorName() {
+    return this._authorName
   }
 
   get roomId() {

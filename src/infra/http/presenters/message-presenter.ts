@@ -6,6 +6,7 @@ export class MessagePresenter {
       id: message.id,
       content: message.content,
       author_id: message.authorId,
+      author_name: message.authorName,
       room_id: message.roomId,
       timestamp: message.timestamp,
     }
