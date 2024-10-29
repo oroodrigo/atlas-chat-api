@@ -29,6 +29,7 @@ import { UserPayload } from '@/infra/auth/jwt.strategy'
 import { ZodValidationPipe } from '../../pipes/zod-validation-pipe'
 import { MessagePresenter } from '../../presenters/message-presenter'
 import { RoomPresenter } from '../../presenters/room-presenter'
+import { UserPresenter } from '../../presenters/user-presenter'
 import { EventsGateway, EventsKind } from '../../websocket/events.gateway'
 import {
   CreateMessageBodySchema,
@@ -68,23 +69,19 @@ export class ChatsController {
         ownerId: sub,
       })
 
-      const roomNamespace = this.eventsGateway.server.of(`/room-${room.id}`)
-
       this.eventsGateway.server.emit('new_room', {
         kind: 'new_room' as EventsKind,
         room: RoomPresenter.toHTTP(room),
       })
 
-      roomNamespace.emit('join', { userId: sub, roomId: room.id })
-
       return { room: RoomPresenter.toHTTP(room) }
     } catch (error) {
-      console.log(error)
       throw new BadRequestException()
     }
   }
 
   @Post('/:roomId/join')
+  @HttpCode(200)
   async joinChat(
     @Param('roomId') roomId: string,
     @CurrentUser() user: UserPayload,
@@ -92,15 +89,17 @@ export class ChatsController {
     const { sub } = user
 
     try {
-      await this.joinRoomUseCase.execute({
+      const { userRoom } = await this.joinRoomUseCase.execute({
         roomId,
         userId: sub,
       })
 
-      this.eventsGateway.server.to(`/room-${roomId}`).emit('user_joined', {
-        userId: sub,
+      this.eventsGateway.notifyUsersInRoom(roomId, 'user_joined', {
+        kind: 'user_joined' as EventsKind,
+        user: UserPresenter.toHTTP(userRoom.user),
         roomId,
       })
+      this.eventsGateway.addUserToRoom(roomId, sub)
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
         throw new BadRequestException(error.message)
@@ -144,6 +143,11 @@ export class ChatsController {
         roomId,
         ownerId: sub,
       })
+
+      this.eventsGateway.notifyUsersInRoom(roomId, 'delete_room', {
+        roomId,
+      })
+      this.eventsGateway.deleteRoom(roomId)
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
         throw new BadRequestException(error.message)
@@ -195,13 +199,12 @@ export class ChatsController {
         roomId,
       })
 
-      this.eventsGateway.server.to(roomId).emit('new_message', {
+      this.eventsGateway.notifyUsersInRoom(roomId, 'new_message', {
         kind: 'new_message' as EventsKind,
         message: MessagePresenter.toHTTP(message),
       })
 
       return {
-        kind: 'new_message' as EventsKind,
         message: MessagePresenter.toHTTP(message),
       }
     } catch (error) {
@@ -242,6 +245,11 @@ export class ChatsController {
       await this.deleteMessageUseCase.execute({
         authorId: sub,
         roomId,
+        messageId,
+      })
+
+      this.eventsGateway.notifyUsersInRoom(roomId, 'delete_message', {
+        kind: 'new_message' as EventsKind,
         messageId,
       })
     } catch (error) {

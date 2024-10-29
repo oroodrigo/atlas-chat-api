@@ -74,7 +74,6 @@ export class PrismaRoomsRepository implements RoomsRepository {
 
   async save(room: Room) {
     const data = PrismaRoomMapper.toPrisma(room)
-    console.log('save', data)
 
     await this.prisma.room.update({
       data,
