@@ -99,7 +99,6 @@ export class ChatsController {
         user: UserPresenter.toHTTP(userRoom.user),
         roomId,
       })
-      this.eventsGateway.addUserToRoom(roomId, sub)
     } catch (error) {
       if (error instanceof ResourceNotFoundError) {
         throw new BadRequestException(error.message)

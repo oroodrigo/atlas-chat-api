@@ -6,7 +6,6 @@ export type EventsKind =
   | 'user_connected'
   | 'user_disconnected'
   | 'new_room'
-  | 'join'
   | 'user_joined'
   | 'delete_room'
   | 'new_message'
@@ -30,19 +29,11 @@ export class EventsGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(`Client connected, client id: ${socket.id}`)
-
       socket.on('join_room', (roomId: string) => {
         this.addUserToRoom(roomId, socket.id)
-        socket.join(roomId)
-        socket.broadcast.to(roomId).emit('user_joined', {
-          userId: socket.id,
-          roomId,
-        })
       })
 
       socket.on('disconnect', () => {
-        console.log(`Client disconnected, client id: ${socket.id}`)
         this.removeUserFromRooms(socket.id)
       })
     })
